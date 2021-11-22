@@ -1,0 +1,15 @@
+[Unit]
+Description=Thistation Profile Setup
+After=sysinit.target pkg.service
+Before=shutdown.target
+ConditionPathIsReadWrite=/etc
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+EnvironmentFile=/etc/thinstation.env
+ExecStart=/etc/init.d/profile-setup
+SyslogIdentifier=thinstation
+
+[Install]
+WantedBy=multi-user.target

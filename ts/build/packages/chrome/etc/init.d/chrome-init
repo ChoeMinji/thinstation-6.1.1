@@ -1,0 +1,34 @@
+#! /bin/sh
+
+. `dirname $0`/common
+HOME=/etc/skel
+
+ if ! pkg_initialized $PACKAGE; then
+	pkg_set_init_flag $PACKAGE
+	if [ ! -e $HOME/.config ] ; then
+		mkdir $HOME/.config
+	fi
+	if [ ! -e $HOME/.config/google-chrome ] ; then
+		mkdir $HOME/.config/google-chrome
+		cp -r /etc/chrome/* $HOME/.config/google-chrome/.
+	fi
+	CHROMEPREFS=$HOME/.config/google-chrome/Default/Preferences
+	if [ ! -e $CHROMEPREFS ] ; then
+	    if [ -z $CHROME_HOMEPAGE ]; then
+	    	CHROME_HOMEPAGE="http://www.thinstation.net"
+	    fi
+	    let x=0
+	    # Add any configuration parameters
+	    while [ -n "`eval echo '$SESSION_'$x'_TYPE'`" ] ; do
+		CHROMETYPE=`eval echo '$SESSION_'$x'_TYPE'`
+		if [ "`make_caps $CHROMETYPE`" = "CHROME" ] ; then
+		    CHROMEHP=`eval echo '$SESSION_'$x'_CHROME_HOMEPAGE'`
+		fi
+		let x=x+1
+	    done
+	    if [ -n "$CHROMEHP" ] ; then
+		CHROME_HOMEPAGE=$CHROMEHP
+	    fi
+	    sed -e 's|http://www.thinstation.org|'$CHROME_HOMEPAGE'|g' /etc/chrome/Default/Preferences.tpl >> $CHROMEPREFS
+	fi
+ fi
